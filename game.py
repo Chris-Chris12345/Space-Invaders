@@ -70,10 +70,28 @@ def make_lasers_active():
     player_lasers_active = 1
 
 def update_lasers():
-    pass
+    global lasers, aliens
+    for laser in lasers:
+        if laser.type == 0:
+            alien_laser_hit(laser)
+            laser.y += 2
+            if laser.y > HEIGHT:
+                laser.status = 1
+        if laser.type == 1:
+            player_laser_hit(laser)
+            laser.y -= 2
+            if laser.y < 5:
+                laser.status = 1
+    
+    aliens = list_cleanup(aliens)
+    lasers = list_cleanup(lasers)
 
-def list_cleanup():
-    pass
+def list_cleanup(l):
+    new_list = []
+    for i in range(len[l]):
+        if l[i] == 0:
+            new_list.append(l[i])
+    return new_list
 
 def player_laser_hit(laser):
     global score
@@ -84,14 +102,44 @@ def player_laser_hit(laser):
             alien.status = 1
             score += 100
 
-def alien_laser_hit():
-    pass
+def alien_laser_hit(laser):
+    if player.collidepoint(laser.x, laser.y):
+        player.status = 1
+        laser.status = 1
+        sounds.explosion.play()
+
 
 def init_aliens():
     pass
 
 def update_aliens():
-    pass
+    global move_sequence, lasers
+    move_x = 0
+    move_y = 0
+    if move_sequence < 10 or move_sequence > 30:
+        move_x = -15
+    if move_sequence == 10 or move_sequence == 30:
+        move_y = 50
+    if move_sequence > 10 or move_sequence < 30:
+        move_x = 15
+    
+    for alien in aliens:
+        animate(alien, pos = (alien.x + move_x, alien.y + move_y), duration = 0.5, tween = "linear")
+
+        if randint(0,1) == 0:
+            alien.image("alien1")
+        else:
+            alien.image("alien2")
+            if randint(0,10) == 0:
+                l = len(lasers)
+                lasers.append("laser2",midtop = alien.midbotttom)
+                lasers[l].status = 0
+                lasers[l].type = 0
+        
+    move_sequence += 1
+    if move_sequence == 40:
+        move_sequence = 0
+
 
 def init_game():
     pass
